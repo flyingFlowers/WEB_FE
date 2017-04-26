@@ -5,17 +5,11 @@
 ##### 主流浏览器的内核问题
 
 | 浏览器         | 内核           |
-
 | ------------- |:-------------: |
-
 | IE            | trient         |
-
 | chrome        | webkit         |
-
 | fireFox       | gecko          |
-
 | opera         | presto->blink  |
-
 | safari        | webkit->blink  |
 
 ##### 浏览器的两种模式
@@ -146,6 +140,10 @@
         }
     }
 ```
+
+#### HTML和CSS方面的
+
+
 
 
 
