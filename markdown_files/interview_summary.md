@@ -141,9 +141,75 @@
     }
 ```
 
+##### 标准的盒子模型与IE的盒子模型
+
+* 标准盒子模型： margin + border + padding + content
+这是W3C标准的盒子模型，即box-sizing: conten-box(默认)
+
+* IE的盒子模型：margin + content（border + padding + content）。其中content为三个之和，即box-sizing: border-box;
+
 #### HTML和CSS方面的
 
+##### CSS选择器的权重问题
 
+| 选择器            | 权重           |
+| -------------    |:-------------: |
+| !important       | 无穷大          |
+| 行间样式          | 1000           |
+| id               | 100            |
+| class\|属性\|伪类 | 10             |
+| 标签\|伪元素      | 1              |
+| 通配符*           | 0              |
+
+##### 消除浮动的方式
+
+* 在外层wrapper上面使用伪元素
+
+```
+    .wrapper::after {
+        content: '';
+        clear: both;
+        display: block;//消除浮动必须是block
+    }
+```
+
+* 将外层wrapper的display变成inline-block
+
+* 将外层的wrapper也float
+
+* 将外层的wrapper里面添加overflow:hidden
+
+* 将外层的wrapper的position设为fixed或者absolute
+
+* 对于IE来说没有伪元素，通过hasLayout出发bfc
+``` 
+    *zoom: 1;//ie6和ie7
+```
+
+```
+    _zoom: 1;//只有ie6能识别
+```
+
+##### 说一下margin合并和margin塌陷问题
+
+margin合并问题： 当一个元素在另一个元素上面的时候，他们的margin会有重合的部分。可以把他们包裹在一个大的wrapper里面，设置wrapper的overflow为hidden。还可以将这两个元素float一下，但是这样可能会带来上面的问题。
+
+margin塌陷问题：对于父块DIV内含子块DIV的情况，就会按另一条CSS惯例来解释了，那就是：对于有块级子元素的元素计算高度的方式,如果元素没有垂直边框和填充,那其高度就是其子元素顶部和底部边框边缘之间的距离。常用的解决方式：在父级上方添加一个看不到的border或者overflow设置为hidden。
+
+##### 单行文字截断打点
+
+```
+    {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+```
+这种设置的兼容性不好，最牛逼的还是强写，就像百度那样。。。
+
+#### javascript方面的
+
+##### 说一下闭包问题
 
 
 
