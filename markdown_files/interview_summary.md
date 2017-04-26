@@ -207,6 +207,121 @@ margin塌陷问题：对于父块DIV内含子块DIV的情况，就会按另一�
 ```
 这种设置的兼容性不好，最牛逼的还是强写，就像百度那样。。。
 
+##### 说一说事件冒泡与事件捕获
+
+* 事件冒泡：所有的浏览器都支持。结构上（非视觉上）嵌套关系的元素，会存在事件冒泡的功能，即同一个事件，自子元素冒向父元素（自底向上）
+
+* 事件捕获：只有chrome浏览器支持，只有在addEventListener种开启，自顶向下。一个事件要么事件冒泡，要么事件捕获，不可同时设置。
+
+这个时候可以讲一下下面的例子
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #wrapper {
+            width: 400px;
+            height: 400px;
+            background-color: red;
+        }        
+        #box {
+            width: 250px;
+            height: 250px;
+            background-color: green;
+        }
+        #content {
+            width: 150px;
+            height: 150px;
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="box">
+            <div id="content"></div>
+        </div>
+    </div>
+    <script>
+        var wrapper = document.getElementById('wrapper'),
+            box = document.getElementById('box'),
+            content = document.getElementById('content');
+        wrapper.addEventListener('click', function () {
+            console.log('wrapper bubble');
+        }, false);
+        box.addEventListener('click', function () {
+            console.log('box bubble');
+        }, false);
+        content.addEventListener('click', function () {
+            console.log('content bubble');
+        }, false);
+
+        wrapper.addEventListener('click', function () {
+            console.log('wrapper catch');
+        }, true);
+        box.addEventListener('click', function () {
+            console.log('box catch');
+        }, true);
+        content.addEventListener('click', function () {
+            console.log('content catch');
+        }, true);
+
+    </script>
+</body>
+</html>
+```
+当点击content的时候
+![事件冒泡与捕获](../src/img/bubbleCatch-1.png)
+
+大家看第三行和第四行，有点搞不清楚。我们将代码变换一下
+
+```
+<script>
+        var wrapper = document.getElementById('wrapper'),
+            box = document.getElementById('box'),
+            content = document.getElementById('content');
+        
+        wrapper.addEventListener('click', function () {
+            console.log('wrapper catch');
+        }, true);
+        box.addEventListener('click', function () {
+            console.log('box catch');
+        }, true);
+        content.addEventListener('click', function () {
+            console.log('content catch');
+        }, true);
+
+
+        wrapper.addEventListener('click', function () {
+            console.log('wrapper bubble');
+        }, false);
+        box.addEventListener('click', function () {
+            console.log('box bubble');
+        }, false);
+        content.addEventListener('click', function () {
+            console.log('content bubble');
+        }, false);
+
+
+
+    </script>
+```
+再看一下结果
+![事件冒泡与捕获](../src/img/bubbleCatch-2.png)
+
+代码调换一下之后，其余没有变，但是第三行和第四行的执行顺序变了。
+
+由此，我们可以知道，无论是事件捕获还是事件冒泡，都不是针对自己的，都是针对父级或者子元素。绑在自身的事件叫做事件执行。
+执行顺序：先捕获，然后自身事件执行，最后冒泡
+
+
+
+
+
 #### javascript方面的
 
 ##### 说一下闭包问题
@@ -276,7 +391,89 @@ jquery最大的特点就是将所有的成员变量即方法写到了立即执�
         }
     }
 ```
-到这里的话闭包就讲的差不多了，下面就刚才这个例子继续给他将预编译的过程，或者将es6。
+到这里的话闭包就讲的差不多了，下面就刚才这个例子继续给他将[预编译](#preview-compile)的过程，或者讲[es6](#es-6)。
+
+##### <span id="preview-compile"/>预编译
+
+js文件在执行之前，要经过一个预编译的过程。预编译的过程分成四个步骤：
+1. 创建AO对象
+
+2. 找形参和变量声明，将变量和形参名作为AO对象的属性名，值为undefined
+
+3. 将实参与形参统一
+
+4. 找函数声明，值赋值为函数体
+
+这就是为什么在js文件中，有些变量在文件后面声明，但是在文件前部访问的时候不报错而且值为undefined。从中可以得出，函数声明提升是整体提升（值为函数体），而变量声明提升是局部提升（即值为undefined）
+
+##### 包装类
+
+
+为了便于操作基本类型值，ECMAScript 提供了 3 个特殊的引用类型：Boolean、Number和 String。这些类型与其他引用类型相似，但同时也具有与各自的基本类型相应的特殊行为。实际上，每当读取一个基本类型值的时候，后台就会创建一个对应的基本包装类型的对象，从而能够调用一些方法来操作这些数据。
+但是自定义的成员在使用完毕之后就会被销毁
+
+```
+    var str = 'abcd';
+    str.leng = 4;//使用完毕之后就会被销毁
+    console.log(str.leng);//undefined
+```
+
+##### 说一说原型
+
+javascript语言没有向c，java那样的继承机制，要想体现这一思想，只有原型。当一个对象调用某个成员变量或者方法的时候，它首先会在自身的作用域中查找对应的成员，如果找到就做出相应操作并且返回。如果没有找到，会去它的原型上面找，原型还可能又原型，只要找到该成员方法就返回，多个原型构成了像一条链一样构成了原型链。绝大多数的对象最终都会继承自Object.prototype
+
+继承的发展大概有这么四种，也是四个发展的阶段
+1. 传统形式就是有什么继承什么。这样会继承太多没用的属性。
+
+2. 借用构造函数。严格来说，这个根本不算是继承，它只是借用别人的函数来实现一些功能。这样不能继承借用构造函数的原型，而且每次构造函数都要多走一个函数。
+```
+    function Foo(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+    function Son(name, age) {
+        Foo.call(this, name, age);
+    }
+    var son = new Son('xujian', 21);//{name: 'xujian", age: 21}
+```
+
+3. 共享原型：一个函数共享另一个函数的原型，这样如果通过自身的函数改变了改原型的变量，则继承改原型的函数原型当然也就改变。
+
+4. 加中间层（圣杯模式）：针对第三种方法的缺陷，加一个中间层就可以杜绝。
+```
+    var inherit = (function () {
+        var F = function () {}
+        return function (P, C) {
+            F.prototype = P.prototype;
+            C.prototype = new F();
+            C.constructor = C;//构造函数设置为C
+            C.uber = P;//超类设置为P
+        }
+    } ())
+```
+
+##### 数组去重问题
+
+不多说，直接上代码
+
+```
+    Array.prototype.unique = function () {//原型链编程
+        var obj = {};
+        var arr = [];
+        var len = this.length;
+        for(var i = 0; i < len; i ++) {
+            if(obj[this[i]] != 1) {
+                arr.push(this[i]);
+                obj[this[i]] == 1;
+            }
+        }
+        return arr;
+    }
+```
+这里采用的是原型链上编程，可以使所有的数组都可以使用这个方法，这也是原型链编程的一大好处。
+
+
+
 
 
 
