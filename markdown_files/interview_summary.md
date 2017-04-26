@@ -211,7 +211,73 @@ margin塌陷问题：对于父块DIV内含子块DIV的情况，就会按另一�
 
 ##### 说一下闭包问题
 
-每一个javascript函数都是一个对象，它在每一次执行的时候都会生成一个独一无二的执行期上下文，并且在函数执行完毕之后就释放这个资源，即外部环境是无法访问函数内部的成员。闭包就是函数内部的部分资源占着内存没有释放，导致外部可以访问这部分资源。闭包会导致内存泄漏。闭包既有优势又有劣势，但是总体来说劣势大于优势，所以要避免使用。但是也有很多的好处，例如jquery就是利用了闭包的特点。（下面开始将jquery）
+每一个javascript函数都是一个对象，它在每一次执行的时候都会生成一个独一无二的执行期上下文，并且在函数执行完毕之后就释放这个资源，即外部环境是无法访问函数内部的成员。闭包就是函数内部的部分资源占着内存没有释放，导致外部可以访问这部分资源。闭包会导致内存泄漏。闭包既有优势又有劣势，但是总体来说劣势大于优势，所以要避免使用。但是也有很多的好处，例如jquery就是利用了闭包的特点。（下面开始吹jquery）
+
+jquery本身就是一个立即执行函数，它利用了闭包的优势，将自己的成员变量$挂在到了window上面，这样即使立即执行函数执行完毕之后，仍然能够访问到$。
+jquery最大的特点就是将所有的成员变量即方法写到了立即执行函数的参数里面。其中主函数只是把参数的factory函数执行一下。
+在factory函数中首先定义了jquery的初始化函数，这个函数只是调用了jquery.fn.init方法而已。所以绝大部分的方法是在jquery.fn.init中定义的。而jquery.fn = jquery.prototype,也就是说jquery中调用的函数就是其父级上上面的函数。jquery中y偶jquery.fn.prototype = jquery.fn,也就是说在父级的init函数中又把它的父级指向了jquery的父级，这样的话jquery.prototype可以访问init函数，而jquery.prototype.init.prototype又指向了jquery.prototype,这样就是无线循环的指向了。(同学们可以输出jquery.prototype看一下)。
+自己也可以仿照jquery的这种格式写自己的"jquery",我就暂且命名为xquery了
+```
+    (function (global, factory) {
+        factory(global);
+    } (window, function (window) {
+        var xquery = function () {
+            return new xquery.fn.init();
+        }
+        xquery.fn = xquery.prototype;
+        var init = xquery.fn.init = function () {
+            return {
+                name: 'xujian',
+                test: function () {
+                    console.log('I am xquery');
+                }
+            }
+        }   
+        init.prototype = xquery.fn;
+        window.$ = window.xquery = xquery();
+        return xquery;
+    }));
+```
+以上就是jquery对闭包的应用(可以吹个3分钟吧)，如果面试官没有问题jquery的问题，那你可以继续吹嘛。
+
+（意犹未尽的脸）当然在编程中还是要注意闭包问题，比如最经典的闭包问题就是一个数组（假设10个），每个元素绑定一个function,要求输出他们的index值，最后执行的时候发现输出了10个10。这个就是闭包带来的。
+
+```
+    function retB() {
+        var arr = [];
+        for(var i = 0; i < 10; i ++) {
+            arr[i] = function () {
+                console.log(i);
+            }
+        }
+    }
+    var testArr = retB();
+    for(var j = 0; j < testArr.length; j ++) {
+        testArr[i]();//输出10 个 10
+    }
+```
+造成这种现象的原因就是数组中的每个元素要访问原来函数中的i只，经过一番循环之后，i已经变成了10，所以会输出10个10。解决的方法就是把下面这段代码换掉
+
+```
+    arr[i] = function () {
+        console.log(i);
+    }
+    换成
+    arr[i] = (function (n) {
+        console.log(n);
+    } (i));
+```
+或者使用es6中的let
+
+```
+    for(let i = 0; i < 10; i ++) {
+        arr[i] = function () {
+            console.log(i);
+        }
+    }
+```
+到这里的话闭包就讲的差不多了，下面就刚才这个例子继续给他将预编译的过程，或者将es6。
+
 
 
 
