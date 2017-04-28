@@ -144,7 +144,7 @@
 ##### 标准的盒子模型与IE的盒子模型
 
 * 标准盒子模型： margin + border + padding + content
-这是W3C标准的盒子模型，即box-sizing: conten-box(默认)
+这是W3C标准的盒子模型，即box-sizing: content-box(默认)
 
 * IE的盒子模型：margin + content（border + padding + content）。其中content为三个之和，即box-sizing: border-box;
 
@@ -472,7 +472,139 @@ javascript语言没有向c，java那样的继承机制，要想体现这一思�
 ```
 这里采用的是原型链上编程，可以使所有的数组都可以使用这个方法，这也是原型链编程的一大好处。
 
-<a id="es6">es6</a>
+#### h5方面的问题
+
+1. canvas：画布
+
+canvas画出来的图是位图，位图在放大之后会失真；与之相对应的就是svg的矢量图，即无论如何放大都不会失真（如丝般顺滑）。
+使用的时候就是一个canvas标签，也可以通过js来创建该元素。可以指定width和height，默认的width：300，height：150。我们如果想要开始画图，必须获取它的上下文对象(画笔)
+
+> var ctx = canvas.getContext('2d');
+
+之所以不是3d，是因为如果是3d就是webgl（这里不做多的解释）。常见的一些用法如下：
+
+* beginPath()
+* moveTo()
+* stroke()
+* fill()
+* closePath()
+
+还有一些高级的用法：
+
+* strokeRect(x, y, dx, dy)
+* fillRect(x, y, dx, dy)
+* clearRect(x, y, dx, dy):常用来擦出当前区域
+* arc(x, y, r, 起始弧度, 结束弧度, 弧形方向)：绘制弧形，弧形方向0为顺时针，1为逆时针
+
+其中要特别说明的一些方法：
+* drawImage():共有三种三种参数形式，第一个参数都是img(image,video, canvas)
+3个参数：drawImage(img, x, y)会将img整个截取，从(x, y)的点开始放置；5个参数：drawImage(img, x, y, dx, dy)会将img整个截取，放置到Rect(x, y, dx, dy)的矩形中去；9个参数：drawImage(img, x1, y1, dx1, dy1, x2, y2, dx2, dy2)会从img上截取Rect(x1, y1, dx1, dy1)的矩形图样放置到Rect(x2, y2, dx2, dy2)的矩形区域。
+
+* toDataURL()：将canvas的内容抽取成一张图片，是canvas自身的方法，不是ctx的。（注意同源策略）的限制
+
+* 获取canvas的像素信息：getImageData(x, y, dx, dy),createImageData(w, h), putImageData(d, x, y)
+
+canvas的简单介绍就到这里了。
+
+2. svg相关问题
+
+正如上面提到的，svg是矢量图，也可以设置宽高。与canvas的不同是，svg所有的操作都是在html页面中的，不需要js。常见的标签：
+
+* 直线：
+```
+    <line x1="10" y1="10" x2="20" y2="20"></line>
+```
+
+* 矩形： 
+```
+    <rect x="50" y="50" width="100" height="100" rx="10" ry="20"></rect>//rx与ry是用来设置border-radius
+```
+
+* 原形：
+```
+    <circle r="50" cx="200" cy="200"></circle>
+```
+
+* 椭圆：
+```
+    <ellipse rx="100" ry="50" cx="200" cy="200"></ellipse>
+```
+
+* 折线：
+```
+    <polyline points="60 50, 75 35, 100 50, 125, 35"></polyline>
+```
+
+* 多边形：
+```
+    <polygon points="125 125, 130 140, 120 140"></polygon>
+```
+
+* 文本
+```
+    <text x="125" y="220">Hello World</text>
+```
+
+* 里面还有一种万能的：
+```
+    <path d="M 10 10 L 20 10"/>
+    /*
+        指令m,l,h,v都有大小写，大写为绝对坐标，小写为相对坐标
+        1.M指令和L指令：类比canvas的moveTo和lineTofangfa
+        2.H指令和V指令：水平移动和竖直移动
+        3.z指令（不区分大小写）：返回起点
+        4.A指令：七个参数 rx ry 圆弧相对于x轴旋转角度 大小圆弧（1表示大） 顺逆时针（1表示顺时针与canvas的arc不同） x y
+                rx,ry表示圆弧x轴的半径和y轴半径
+                x,y表示终点坐标
+    */
+```
+
+svg的简单介绍就到这里了
+
+3. requestAnimationFrame和cancelAnimationFrame
+
+我们浏览器都有一个最短的刷新周期，也就是说在周期中页面任何变化必须等到下一个周期才能体现，大概是16ms。我们有两个函数setInterval和setTimeout，如果我们把定时器的时间预定的太小，小于它的最小周期，则不能正常运行。
+requestAnimationFrame就是解决这个问题的，它根据不同的浏览器，将定时定位该周期，与setTimeout相似。
+```
+    var id = requestAnimationFrame(function () {//只会执行一次，与setTimeout相似
+        console.log('hi');
+    });
+    cancelAnimationFrame(id);//取消
+```
+
+4. video与audio方面的
+
+是h5新加的标签，我们以前如果在页面中插入视频的话需要借助于flash，前端的代码也是一大堆，现在有了video只需要一行代码就能够搞定了。
+```
+    <audio src="资源链接" autoplay controls loop></audio>
+    <video src="资源链接" autoplay controls post="代替的图片"></video>
+```
+
+5. cookie,localStorage和sessionStorange
+
+* cookie: cookie添加在请求首部的一些消息，所以通常大小不能太大，大概就是4k左右，而且只能采用get请求，存在与客户的硬盘中，可以设置过期时间，仅同一域名下的网站能访问。典型的应用就是服务器判断用户是否登录，因为浏览器http请求是无状态的，所以服务器要想判断用户的状态只能通过cookie。关于浏览器如何根据cookie判断用户登录状态的，访问[使用cookie做用户登录的过程详解](http://blog.csdn.net/looksunli/article/details/9799395)。还有一个应用就是购物车，在localStorage没出来之前，都是用cookie保存商品信息，localStorage出来后也算是解放了cookie。
+* localStorage：存在于用户的硬盘中，大小约为5M，必须手动删除，否则永远存在，所有网站都能访问。
+* sessionStorage：仅是当前页面可以使用，退出后删除，用的较少。
+
+6. history
+
+* forward(),back(),go()
+* pushState(state, title, url),replaceState(state, title, url)
+* 事件：popstate当状态返回的时候；hashchange当hash值改变的时候触发。
+
+7. 地理位置：
+window.navagator.geolocation的对象：
+* getCurrentPosition(success, error, options)
+success为成功的回调函数，error为失败的回调函数，options可以设置超时时间(timeout)以及最大的数据过期时间（maximumAge）等
+* watchPosition(s, e, o)
+* clearWatch(id)
+
+8. web离线应用
+必须在html文件指明后缀名为.appche的文件，文件中一共分成三个部分，一部分是缓存的，一部分是绝对不能缓存的，最后一部分是离线之后转到的页面通常为404错误页面
+
+9. worker
+
+js为单线程的语言，当页面有大量运算进行的时候，会阻塞页面，造成页面的交互都停止。worker就是将这部分运算替主线程完成，最终返回给主线程，这样就不会阻塞页面了。
 
 
 
