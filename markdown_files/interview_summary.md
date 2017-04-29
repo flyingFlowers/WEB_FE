@@ -606,7 +606,52 @@ success为成功的回调函数，error为失败的回调函数，options可以�
 
 js为单线程的语言，当页面有大量运算进行的时候，会阻塞页面，造成页面的交互都停止。worker就是将这部分运算替主线程完成，最终返回给主线程，这样就不会阻塞页面了。
 
+#### CSS3方面的
 
+这个方面的面试官一般不好问，要么给你个情景让你实现效果，要么就直接问你效果，主要掌握几个css新增属性就可以了。具体的效果展示，参考[css参考手册](http://www.css88.com/book/css/)。
+
+1. 盒子模型（flex新）
+* flex-grow:指定扩展比率，默认为1。
+* flex-shrink: 指定收缩比率，默认为1。
+* flex-basis: 指定伸缩的基准值，当与width发生冲突的时候，取flex-basis。
+* flex-direction: 决定flex需要如何排列（row|row-reverse|column|column-reverse）
+* flex-wrap: 单行或者多行（nowrap|wrap|wrap-reverse）
+* align-content: 多行文本对齐方式（flex-start|flex-end|center|space-between|space-around|stretch）
+* align-items: 子项的纵向对齐方式（flex-start|flex-end|center|baseline|stretch）
+* align-self: 定义flex子项单独在侧轴（纵轴）方向上的对齐方式。
+* justify-content:（横轴）方向上的对齐方式(flex-start| flex-end|center|space-between|space-around)
+* order: 设置或检索弹性盒模型对象的子元素出現的順序。
+
+2. transform变换
+* transform:
+![transform方法一览表](../src/img/css3-transform-1.png)
+* transform-origin: 设置或检索对象以某个原点进行转换。(默认为50% 50%也就是center)
+* transform-style: 指定某元素的子元素是（看起来）位于三维空间内，还是在该元素所在的平面内被扁平化。(flat(默认)|preserve-3d)
+* perspective 景深
+
+3.transition过渡
+
+* transition: property duration timing-function delay 
+```
+取值：
+    <'transition-property '>：检索或设置对象中的参与过渡的属性
+    <'transition-duration '>：检索或设置对象过渡的持续时间
+    <'transition-timing-function '>：检索或设置对象中过渡的动画类型
+    <'transition-delay '>：检索或设置对象延迟过渡的时间
+```
+
+4. animation动画
+* animation: name duration timing-function delay iteration-count direction fill-mode play-state
+```
+<'animation-name'>：检索或设置对象所应用的动画名称
+<'animation-duration'>：检索或设置对象动画的持续时间
+<'animation-timing-function'>：检索或设置对象动画的过渡类型
+<'animation-delay'>：检索或设置对象动画延迟的时间
+<'animation-iteration-count'>：检索或设置对象动画的循环次数
+<'animation-direction'>：检索或设置对象动画在循环中是否反向运动
+<'animation-fill-mode'>：检索或设置对象动画时间之外的状态
+<'animation-play-state'>：检索或设置对象动画的状态。w3c正考虑是否将该属性移除，因为动画的状态可以通过其它的方式实现，比如重设样式
+```
 
 
 
