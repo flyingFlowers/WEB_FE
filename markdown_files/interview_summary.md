@@ -652,7 +652,21 @@ js为单线程的语言，当页面有大量运算进行的时候，会阻塞页
 <'animation-fill-mode'>：检索或设置对象动画时间之外的状态
 <'animation-play-state'>：检索或设置对象动画的状态。w3c正考虑是否将该属性移除，因为动画的状态可以通过其它的方式实现，比如重设样式
 ```
+5. 选择器
+* 元素选择器
+![元素选择器](../src/img/css3-selectors-1.png)
 
+* 关系选择器
+![关系选择器](../src/img/css3-selectors-2.png)
+
+* 属性选择器
+![属性选择器](../src/img/css3-selectors-3.png)
+
+* 伪类选择器
+![伪类选择器](../src/img/css3-selectors-4.png)
+
+* 伪元素选择器
+![伪对象选择器](../src/img/css3-selectors-5.png)
 
 
 
