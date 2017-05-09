@@ -472,6 +472,38 @@ javascript语言没有向c，java那样的继承机制，要想体现这一思�
 ```
 这里采用的是原型链上编程，可以使所有的数组都可以使用这个方法，这也是原型链编程的一大好处。
 
+##### 深度克隆问题
+```
+    function cloneDeep(src, tar) {
+        var tar = tar || {};
+        var toStr = Object.prototype.toString;
+        for(var prop in src) {
+            if(src.hasOwnProperty(prop)) {
+                if(typeof(src[prop]) == 'object') {
+                    tar[prop] = toStr.call(src[prop]) == 'object Array' ? [] : {};
+                    cloneDeep(src[prop], tar[prop]);
+                }else {
+                    tar[prop] = src[prop];
+                }
+            }
+        }
+        return tar;
+    }
+```
+以上的方法，当然默认是克隆一个已知的Object对象了，通过上述方法克隆出来的对象能够达到深度克隆的目的。
+
+注意：之前已知以为可以用Array.prototype.slice()方法来代替上述深度克隆的方法，但是其实是不正确的。我们来看一下代码：
+```
+    var arr = [{name: 'xujian', age: 22}, [1, 2, 3]];
+    var arr2 = Array.prototype.slice.call(arr);
+    arr[0].name = 'allen';
+    arr[1].push(4);
+    console.log(arr2);
+```
+让我们来看一下结果：
+![数组slice克隆](../src/img/arrClone.png)
+我们改变的是arr,但是输出的arr2也相应的改变了。也就是说数组如果还是有引用类型的数据，slice是无法实现深度克隆的。
+
 #### h5方面的问题
 
 1. canvas：画布
