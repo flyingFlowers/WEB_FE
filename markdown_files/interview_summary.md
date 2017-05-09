@@ -501,7 +501,9 @@ javascript语言没有向c，java那样的继承机制，要想体现这一思�
     console.log(arr2);
 ```
 让我们来看一下结果：
+
 ![数组slice克隆](../src/img/arrClone.png)
+
 我们改变的是arr,但是输出的arr2也相应的改变了。也就是说数组如果还是有引用类型的数据，slice是无法实现深度克隆的。
 
 #### h5方面的问题
